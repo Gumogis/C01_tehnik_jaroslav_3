@@ -47,6 +47,7 @@ public class Renderer {
             Point3D pointA = new Point3D(transdpoints.get(i));
             Point3D pointB = new Point3D(transdpoints.get(i+1));
 
+            if (isInView(pointA, pointB)) {
             if(pointA.getW() == 0 || pointB.getW() == 0){
 
             }
@@ -67,7 +68,28 @@ public class Renderer {
             );
 
             lineRasterizer.drawLine(line, solid.getColor());
+            }
         }
+    }
+
+    private boolean isInView(Point3D pointA, Point3D pointB) {
+        boolean boolA =
+                pointA.getX() > -pointA.getW()
+                        && pointA.getX() < pointA.getW()
+                        && pointA.getY() > -pointA.getW()
+                        && pointA.getY() < pointA.getW()
+                        && pointA.getZ() > -pointA.getW()
+                        && pointA.getZ() < pointA.getW();
+
+        boolean boolB =
+                pointB.getX() > -pointB.getW()
+                        && pointB.getX() < pointB.getW()
+                        && pointB.getY() > -pointB.getW()
+                        && pointB.getY() < pointB.getW()
+                        && pointB.getZ() > -pointB.getW()
+                        && pointB.getZ() < pointB.getW();
+
+        return boolA && boolB;
     }
 
     private Vec3D transformToScreen(Vec3D point){

@@ -16,7 +16,7 @@ import java.awt.event.MouseMotionAdapter;
 public class Controller3D {
     private final Panel panel;
     private final Renderer renderer;
-    private Solid arrow;
+    private Solid cube;
     private LineRasterizer lineRasterizer;
     private Camera camera;
     private Mat4PerspRH proj;
@@ -27,12 +27,9 @@ public class Controller3D {
     private CubicCurve cubicCurve;
     private final double CameraSpeed = 0.1;
     private final double sensitivity = 0.01;
-    private boolean firstPerson = false;
-    /*Hello*/
+
     public Controller3D(Panel panel) {
-        Vec2D tr = new Vec2D(-1.0,-1.0);
-        tr = new Vec2D(tr.mul(new Vec2D(1,-1)).add(new Vec2D(1,1)).mul(new Vec2D(499,199)));
-        System.out.println(tr);
+
         curve = new Curve();
         cubicCurve = new CubicCurve();
 
@@ -40,9 +37,9 @@ public class Controller3D {
         lineRasterizer = new LineRasterizerTrivial(panel.getRaster());
 
         camera = new Camera()
-                .withPosition(new Vec3D(0,1,-1))
+                .withPosition(new Vec3D(0,0,-1))
                 .withAzimuth(Math.toRadians(90))
-                .withZenith(Math.toRadians(-35))
+                .withZenith(Math.toRadians(-25))
                 .withFirstPerson(true);
 
         proj = new Mat4PerspRH(
@@ -53,7 +50,7 @@ public class Controller3D {
                 );
 
         // Init solids
-        arrow = new Cube();
+        cube = new Cube();
 
         renderer = new Renderer(lineRasterizer, panel.getHeight(), panel.getWidth());
         initObjects();
@@ -80,33 +77,43 @@ public class Controller3D {
                     int key = e.getKeyCode();
 
                     if(key == KeyEvent.VK_W){
-                        camera = camera.backward(CameraSpeed);
-                    }
-
-                    if(key == KeyEvent.VK_A){
-                        camera = camera.right(CameraSpeed);
-                    }
-
-                    if(key == KeyEvent.VK_S){
                         camera = camera.forward(CameraSpeed);
                     }
 
-                    if(key == KeyEvent.VK_D){
+                    if(key == KeyEvent.VK_A){
                         camera = camera.left(CameraSpeed);
                     }
 
-                    if(key == KeyEvent.VK_KP_UP){
+                    if(key == KeyEvent.VK_S){
+                        camera = camera.backward(CameraSpeed);
+                    }
+
+                    if(key == KeyEvent.VK_D){
+                        camera = camera.right(CameraSpeed);
+                    }
+
+                    if(key == KeyEvent.VK_P){
+                        cube.setModel(cube.getModel().mul(new Mat4Transl(-0.5,0,-0.5).mul(new Mat4RotY(Math.toRadians(10)).mul(new Mat4Transl(0.5,0,0.5)))));
+                    }
+
+                    if(key == KeyEvent.VK_L){
+                        cube.setModel(cube.getModel().mul(new Mat4Transl(-0.5,0,-0.5).mul(new Mat4RotY(Math.toRadians(-10)).mul(new Mat4Transl(0.5,0,0.5)))));
+                    }
+
+                    if(key == KeyEvent.VK_UP){
+                        cube.setModel(cube.getModel().mul(new Mat4Transl(0,-0.5,-0.5).mul(new Mat4RotX(Math.toRadians(10)).mul(new Mat4Transl(0,0.5,0.5)))));
                     }
 
                     if(key == KeyEvent.VK_DOWN){
+                        cube.setModel(cube.getModel().mul(new Mat4Transl(0,-0.5,-0.5).mul(new Mat4RotX(Math.toRadians(-10)).mul(new Mat4Transl(0,0.5,0.5)))));
                     }
 
                     if(key == KeyEvent.VK_LEFT){
-                        arrow.setModel(arrow.getModel().mul(new Mat4Transl(-0.5,0,0).mul(new Mat4RotZ(Math.toRadians(-10)).mul(new Mat4Transl(0.5,0,0)))));
+                        cube.setModel(cube.getModel().mul(new Mat4Transl(-0.5,-0.5,0).mul(new Mat4RotZ(Math.toRadians(-10)).mul(new Mat4Transl(0.5,0.5,0)))));
                     }
 
                     if(key == KeyEvent.VK_RIGHT){
-                        arrow.setModel(arrow.getModel().mul(new Mat4Transl(-0.5,0,0).mul(new Mat4RotZ(Math.toRadians(10)).mul(new Mat4Transl(0.5,0,0)))));
+                        cube.setModel(cube.getModel().mul(new Mat4Transl(-0.5,-0.5,0).mul(new Mat4RotZ(Math.toRadians(10)).mul(new Mat4Transl(0.5,0.5,0)))));
                     }
 
                     redraw();
@@ -147,7 +154,7 @@ public class Controller3D {
         renderer.setViewMatrix(camera.getViewMatrix());
         renderer.setProjectionMatrix(proj);
 
-        renderer.renderSolid(arrow);
+        renderer.renderSolid(cube);
 
         renderer.renderSolid(axisX);
         renderer.renderSolid(axisY);
