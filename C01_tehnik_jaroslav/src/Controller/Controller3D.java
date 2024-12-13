@@ -15,23 +15,40 @@ import java.awt.event.MouseMotionAdapter;
 import java.util.ArrayList;
 
 public class Controller3D {
+
+    //rasterizer čar a panely
     private final Panel panel;
     private Renderer renderer;
-    private Solid cube;
-    private Solid cuboid;
     private LineRasterizer lineRasterizer;
+
+    //perspektivní modely
     private Camera camera;
     private Mat4PerspRH proj;
+    private Mat4OrthoRH orthProj;
+
+    // solidové objekty
+    private Solid cube;
+    private Solid cuboid;
     private AxisX axisX;
     private AxisY axisY;
     private AxisZ axisZ;
     private Curve curve;
+    private CubicCurve cubicCurve;
+
+    //listy pro solidy se kterýma budeme pracovat a statické osy xyz
     private ArrayList<Solid> solids;
     private ArrayList<Solid> axis;
-    private int selectedSolid;
-    private CubicCurve cubicCurve;
+
+    //proměnné na změnění rychlosti, barev, booleany
+    private int selectedSolid = 0;
     private final double CameraSpeed = 0.1;
     private final double sensitivity = 0.01;
+    private int selectedColor = 0xFF69B4;
+    private int unselectedColor = 0xFF0000;
+    private boolean rotate = false;
+    private boolean move = false;
+    private boolean zoom = false;
+    private boolean cameraBool = false;
 
     public Controller3D(Panel panel) {
 
@@ -48,8 +65,9 @@ public class Controller3D {
 
     private void initObjects(){
 
+        //objekty pro kameru
         camera = new Camera()
-                .withPosition(new Vec3D(0,0,-1))
+                .withPosition(new Vec3D(0,-6,5))
                 .withAzimuth(Math.toRadians(90))
                 .withZenith(Math.toRadians(-25))
                 .withFirstPerson(true);
@@ -61,16 +79,25 @@ public class Controller3D {
                 200
             );
 
+        orthProj = new Mat4OrthoRH(
+                10,
+                10,
+                0.01,
+                200
+        );
+
         lineRasterizer = new LineRasterizerTrivial(panel.getRaster());
         renderer = new Renderer(lineRasterizer, panel.getHeight(), panel.getWidth());
 
+        // vytváření listů
         axis = new ArrayList<>();
         solids = new ArrayList<>();
+
+        // vytváření objektů
         curve = new Curve();
         cubicCurve = new CubicCurve();
-
         cube = new Cube();
-        cuboid = new Cuboid();
+        cuboid = new Pyramid();
         axisX = new AxisX();
         axisY = new AxisY();
         axisZ = new AxisZ();
@@ -83,7 +110,7 @@ public class Controller3D {
         solids.add(cuboid);
         solids.add(cubicCurve);
 
-        selectedSolid = 0;
+        solids.get(selectedSolid).setColor(selectedColor);
     }
 
     private void initListeners(){
@@ -93,48 +120,109 @@ public class Controller3D {
             public void keyPressed(KeyEvent e) {
                 int key = e.getKeyCode();
 
-                if(key == KeyEvent.VK_W){
+                if(key == KeyEvent.VK_W)
                     camera = camera.forward(CameraSpeed);
-                }
-
-                if(key == KeyEvent.VK_A){
+                if(key == KeyEvent.VK_A)
                     camera = camera.left(CameraSpeed);
-                }
-
-                if(key == KeyEvent.VK_S){
+                if(key == KeyEvent.VK_S)
                     camera = camera.backward(CameraSpeed);
-                }
-
-                if(key == KeyEvent.VK_D){
+                if(key == KeyEvent.VK_D)
                     camera = camera.right(CameraSpeed);
+
+                if(key == KeyEvent.VK_H) {
+                    solids.get(selectedSolid).setColor(unselectedColor);
+                    selectedSolid = (selectedSolid + 1) % (solids.size());
+                    solids.get(selectedSolid).setColor(selectedColor);
                 }
 
-                if(key == KeyEvent.VK_H){
-                    selectedSolid = (selectedSolid+1)%(solids.size());
+                if(key == KeyEvent.VK_P) {
+                    if(rotate)
+                        rotateObject(10, 2);
+                    if(move)
+                        moveObject(1,2);
+                    if(zoom)
+                        zoomObject(2,2);
                 }
-
-                if(key == KeyEvent.VK_P){
-                    rotateObject(0.5,0,0.5,10,2);
-                }
-
                 if(key == KeyEvent.VK_L){
-                    rotateObject(0.5,0,0.5,-10,2);
+                    if(rotate)
+                        rotateObject(-10,2);
+                    if(move)
+                        moveObject(-1,2);
+                    if(zoom)
+                        zoomObject(0.5,2);
+                }
+                if(key == KeyEvent.VK_UP) {
+                    if(rotate)
+                        rotateObject(-10, 1);
+                    if(move)
+                        moveObject(1,1);
+                    if(zoom)
+                        zoomObject(2,1);
+                }
+                if(key == KeyEvent.VK_DOWN) {
+                    if(rotate)
+                        rotateObject(10, 1);
+                    if(move)
+                        moveObject(-1,1);
+                    if(zoom)
+                        zoomObject(0.5,1);
+                }
+                if(key == KeyEvent.VK_LEFT) {
+                    if(rotate)
+                        rotateObject(-10, 0);
+                    if(move)
+                        moveObject(-1,0);
+                    if(zoom)
+                        zoomObject(0.5,0);
+                }
+                if(key == KeyEvent.VK_RIGHT) {
+                    if(rotate)
+                        rotateObject(10, 0);
+                    if(move)
+                        moveObject(1,0);
+                    if(zoom)
+                        zoomObject(2,0);
                 }
 
-                if(key == KeyEvent.VK_UP){
-                    rotateObject(0,0.5,0.5,-10,1);
+                if(key == KeyEvent.VK_8)
+                    moveObject(1,0);
+
+                if(key == KeyEvent.VK_R) {
+                    rotate = !rotate;
+                    if(rotate){
+                        System.out.println("Rotating selected object");
+                    } else{
+                        System.out.println("Stopping rotation of a selected object");
+                    }
                 }
 
-                if(key == KeyEvent.VK_DOWN){
-                    rotateObject(0,0.5,0.5,10,1);
+                if(key == KeyEvent.VK_M){
+                    move = !move;
+                    if(move){
+                        System.out.println("Moving selected object");
+                    } else{
+                        System.out.println("Stopping the movement");
+                    }
                 }
 
-                if(key == KeyEvent.VK_LEFT){
-                    rotateObject(0.5,0.5,0,-10,0);
+                if(key == KeyEvent.VK_Z){
+                    zoom = !zoom;
+                    if(zoom){
+                        System.out.println("Scaling/Zooming the selected object");
+                    } else{
+                        System.out.println("Stopping the zooming/scaling");
+                    }
                 }
 
-                if(key == KeyEvent.VK_RIGHT){
-                    rotateObject(0.5,0.5,0, 10,0);
+                if(key == KeyEvent.VK_C){
+                    camera = new Camera()
+                            .withPosition(new Vec3D(0,0,0))
+                            .withAzimuth(Math.toRadians(90))
+                            .withZenith(Math.toRadians(-25))
+                            .withFirstPerson(true);
+
+                    cameraBool = !cameraBool;
+                    System.out.println("switching perspective");
                 }
 
                 redraw();
@@ -166,14 +254,38 @@ public class Controller3D {
         });
     }
 
-    private void rotateObject(double x, double y, double z, int r, int axis){
-        if(axis == 0)
-            solids.get(selectedSolid).setModel(solids.get(selectedSolid).getModel().mul(new Mat4Transl(-x,-y,z).mul(new Mat4RotZ(Math.toRadians(r)).mul(new Mat4Transl(x,y,z)))));
-        else if(axis == 1)
-            solids.get(selectedSolid).setModel(solids.get(selectedSolid).getModel().mul(new Mat4Transl(x,-y,-z).mul(new Mat4RotX(Math.toRadians(r)).mul(new Mat4Transl(x,y,z)))));
-        else if(axis == 2)
-            solids.get(selectedSolid).setModel(solids.get(selectedSolid).getModel().mul(new Mat4Transl(-x,y,-z).mul(new Mat4RotY(Math.toRadians(r)).mul(new Mat4Transl(x,y,z)))));
+    private void rotateObject(double r, int axis){
+        Point3D xyz = solids.get(selectedSolid).getCenter();
+        xyz = xyz.mul(solids.get(selectedSolid).getModel());
+        double centerX = xyz.getX();
+        double centerY = xyz.getY();
+        double centerZ = xyz.getZ();
 
+        if(axis == 0)
+            solids.get(selectedSolid).setModel(solids.get(selectedSolid).getModel().mul(new Mat4Transl(-centerX,-centerY,0).mul(new Mat4RotZ(Math.toRadians(r)).mul(new Mat4Transl(centerX, centerY, 0)))));
+        else if(axis == 1)
+            solids.get(selectedSolid).setModel(solids.get(selectedSolid).getModel().mul(new Mat4Transl(0,-centerY, -centerZ).mul(new Mat4RotX(Math.toRadians(r)).mul(new Mat4Transl(0, centerY, centerZ)))));
+        else if(axis == 2)
+            solids.get(selectedSolid).setModel(solids.get(selectedSolid).getModel().mul(new Mat4Transl(-centerX,0,-centerZ).mul(new Mat4RotY(Math.toRadians(r)).mul(new Mat4Transl(centerX,0, centerZ)))));
+    }
+
+    private void moveObject(double r, int axis){
+
+        if(axis == 0)
+            solids.get(selectedSolid).setModel(solids.get(selectedSolid).getModel().mul(new Mat4Transl(r,0,0)));
+        else if(axis == 1)
+            solids.get(selectedSolid).setModel(solids.get(selectedSolid).getModel().mul(new Mat4Transl(0,0,r)));
+        else if(axis == 2)
+            solids.get(selectedSolid).setModel(solids.get(selectedSolid).getModel().mul(new Mat4Transl(0,r,0)));
+    }
+
+    private void zoomObject(double r, int axis){
+        if(axis == 0)
+            solids.get(selectedSolid).setModel(solids.get(selectedSolid).getModel().mul(new Mat4Scale(r,1,1)));
+        else if(axis == 1)
+            solids.get(selectedSolid).setModel(solids.get(selectedSolid).getModel().mul(new Mat4Scale(1,1,r)));
+        else if(axis == 2)
+            solids.get(selectedSolid).setModel(solids.get(selectedSolid).getModel().mul(new Mat4Scale(1,r,1)));
 
     }
 
@@ -182,10 +294,14 @@ public class Controller3D {
         panel.clear();
 
         renderer.setViewMatrix(camera.getViewMatrix());
-        renderer.setProjectionMatrix(proj);
+        if(cameraBool){
+            renderer.setProjectionMatrix(orthProj);
+        }else {
+            renderer.setProjectionMatrix(proj);
+        }
 
-        renderer.renderSolids(solids);
         renderer.renderSolids(axis);
+        renderer.renderSolids(solids);
 
         panel.repaint();
     }

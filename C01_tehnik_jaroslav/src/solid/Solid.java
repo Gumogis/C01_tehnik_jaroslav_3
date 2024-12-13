@@ -41,4 +41,18 @@ public class Solid {
     public void setColor(int color) {
         this.color = color;
     }
+
+    public Point3D getCenter(){
+        int vbSize = vb.size();
+        double x = 0;
+        double y = 0;
+        double z = 0;
+        for(Point3D point : vb){
+            x+=point.getX();
+            y+=point.getY();
+            z+=point.getZ();
+        }
+
+        return new Point3D(x/vbSize,y/vbSize,z/vbSize);
+    }
 }
