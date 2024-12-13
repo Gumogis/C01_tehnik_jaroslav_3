@@ -2,6 +2,9 @@ package render;
 
 import Models.Line;
 import Rasterize.LineRasterizer;
+import solid.AxisX;
+import solid.AxisY;
+import solid.AxisZ;
 import solid.Solid;
 import transforms.Camera;
 import transforms.Mat4;
@@ -29,7 +32,9 @@ public class Renderer {
         ArrayList<Point3D> transdpoints = new ArrayList<>();
         //mvp matice
         Mat4 mvp = new Mat4(solid.getModel().mul(view).mul(projection));
-
+        boolean isaxisX = solid instanceof AxisX;
+        boolean isaxisY = solid instanceof AxisY;
+        boolean isaxisZ = solid instanceof AxisZ;
 
         for(int i = 0; i < solid.getIb().size(); i++){
             int indexA = solid.getIb().get(i);
@@ -47,7 +52,7 @@ public class Renderer {
             Point3D pointA = new Point3D(transdpoints.get(i));
             Point3D pointB = new Point3D(transdpoints.get(i+1));
 
-            if (isInView(pointA, pointB)) {
+            if (isInView(pointA, pointB) || isaxisX || isaxisY || isaxisZ) {
             if(pointA.getW() == 0 || pointB.getW() == 0){
 
             }
