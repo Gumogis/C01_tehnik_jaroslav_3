@@ -1,6 +1,5 @@
 package solid;
 
-import transforms.Col;
 import transforms.Mat4;
 import transforms.Mat4Identity;
 import transforms.Point3D;

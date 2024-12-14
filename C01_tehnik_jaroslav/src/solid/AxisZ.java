@@ -1,6 +1,5 @@
 package solid;
 
-import transforms.Col;
 import transforms.Point3D;
 
 public class AxisZ extends Solid {
