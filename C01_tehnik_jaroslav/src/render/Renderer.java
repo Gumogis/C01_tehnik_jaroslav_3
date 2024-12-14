@@ -6,7 +6,6 @@ import solid.AxisX;
 import solid.AxisY;
 import solid.AxisZ;
 import solid.Solid;
-import transforms.Camera;
 import transforms.Mat4;
 import transforms.Point3D;
 import transforms.Vec3D;
@@ -32,9 +31,9 @@ public class Renderer {
         ArrayList<Point3D> transdpoints = new ArrayList<>();
         //mvp matice
         Mat4 mvp = new Mat4(solid.getModel().mul(view).mul(projection));
-        boolean isaxisX = solid instanceof AxisX;
-        boolean isaxisY = solid instanceof AxisY;
-        boolean isaxisZ = solid instanceof AxisZ;
+        boolean isAxisX = solid instanceof AxisX;
+        boolean isAxisY = solid instanceof AxisY;
+        boolean isAxisZ = solid instanceof AxisZ;
 
         for(int i = 0; i < solid.getIb().size(); i++){
             int indexA = solid.getIb().get(i);
@@ -53,7 +52,7 @@ public class Renderer {
             Point3D pointB = new Point3D(transdpoints.get(i+1));
 
             //kontrolujeme jestli máme vykreslit nebo jestli se jedná o osy xyz
-            if (isInView(pointA, pointB) || isaxisX || isaxisY || isaxisZ) {
+            if (isInView(pointA, pointB) || isAxisX || isAxisY || isAxisZ) {
             if(pointA.getW() == 0 || pointB.getW() == 0){
 
             }

@@ -45,7 +45,7 @@ public class Controller3D {
     //proměnné na změnění rychlosti, barev, booleany
     private int selectedSolid = 0;
     private Mat4ViewRH viewProj;
-    private final double CameraSpeed = 0.1;
+    private final double cameraSpeed = 0.1;
     private final double sensitivity = 0.01;
     private int selectedColor = 0xFF69B4;
     private int unselectedColor = 0xFF0000;
@@ -138,21 +138,24 @@ public class Controller3D {
             public void keyPressed(KeyEvent e) {
                 int key = e.getKeyCode();
 
+                //pohyb
                 if(key == KeyEvent.VK_W)
-                    camera = camera.forward(CameraSpeed);
+                    camera = camera.forward(cameraSpeed);
                 if(key == KeyEvent.VK_A)
-                    camera = camera.left(CameraSpeed);
+                    camera = camera.left(cameraSpeed);
                 if(key == KeyEvent.VK_S)
-                    camera = camera.backward(CameraSpeed);
+                    camera = camera.backward(cameraSpeed);
                 if(key == KeyEvent.VK_D)
-                    camera = camera.right(CameraSpeed);
+                    camera = camera.right(cameraSpeed);
 
+                //výběr objektu
                 if(key == KeyEvent.VK_H) {
                     solids.get(selectedSolid).setColor(unselectedColor);
                     selectedSolid = (selectedSolid + 1) % (solids.size());
                     solids.get(selectedSolid).setColor(selectedColor);
                 }
 
+                //tlačítka na transformaci objektů
                 if(key == KeyEvent.VK_P) {
                     if(rotate)
                         rotateObject(10, 2);
@@ -202,6 +205,7 @@ public class Controller3D {
                         zoomObject(2,0);
                 }
 
+                //přepínání módů transformace
                 if(key == KeyEvent.VK_R) {
                     rotate = !rotate;
                     if(rotate)
@@ -226,6 +230,7 @@ public class Controller3D {
                         System.out.println("Stopping the zooming/scaling");
                 }
 
+                //přepínání kamery
                 if(key == KeyEvent.VK_C){
                     camera = new Camera()
                             .withPosition(new Vec3D(0,0,0))
@@ -237,6 +242,7 @@ public class Controller3D {
                     System.out.println("switching perspective");
                 }
 
+                //animace
                 if(key == KeyEvent.VK_J){
                     if (isAnimating)
                         stopAnimation();
