@@ -52,6 +52,7 @@ public class Renderer {
             Point3D pointA = new Point3D(transdpoints.get(i));
             Point3D pointB = new Point3D(transdpoints.get(i+1));
 
+            //kontrolujeme jestli máme vykreslit nebo jestli se jedná o osy xyz
             if (isInView(pointA, pointB) || isaxisX || isaxisY || isaxisZ) {
             if(pointA.getW() == 0 || pointB.getW() == 0){
 
@@ -77,6 +78,7 @@ public class Renderer {
         }
     }
 
+    //kontrola jestli se čáry nachází na kraji obrazovky, pokud přesahují tak se nevykreslí
     private boolean isInView(Point3D pointA, Point3D pointB) {
         boolean boolA =
                 pointA.getX() > -pointA.getW()

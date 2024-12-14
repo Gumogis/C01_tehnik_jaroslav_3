@@ -5,7 +5,7 @@ import transforms.Point3D;
 public class Curve extends Solid {
 public Curve() {
 
-    //upravit, nesmí být stejné
+    //psychotická křivka pohybuje se po všech osách
     int n = 1000;
     for(int i = 0; i <= n; i++){
         float x = i/(float)n;

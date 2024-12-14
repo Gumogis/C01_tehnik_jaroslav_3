@@ -8,10 +8,10 @@ public class CubicFergusonCurve extends Solid {
     public CubicFergusonCurve() {
         // také upravit
 
-        Point3D a = new Point3D(-0.5,0,0);
-        Point3D b = new Point3D(-0.25,0.5,0);
-        Point3D c = new Point3D(0.25,0.5,0);
-        Point3D d = new Point3D(0.5,0,0);
+        Point3D a = new Point3D(-1,1,0);
+        Point3D b = new Point3D(2,2,0);
+        Point3D c = new Point3D(2,1,0);
+        Point3D d = new Point3D(1,2,0);
 
         Cubic cubic = new Cubic(Cubic.FERGUSON,a,b,c,d);
 

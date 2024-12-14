@@ -8,10 +8,10 @@ public class CubicCoonCurve extends Solid {
     public CubicCoonCurve(){
         // také upravit
 
-        Point3D a = new Point3D(-0.5,0,0);
-        Point3D b = new Point3D(-0.25,0.5,0);
-        Point3D c = new Point3D(0.25,0.5,0);
-        Point3D d = new Point3D(0.5,0,0);
+        Point3D a = new Point3D(0,1,1);
+        Point3D b = new Point3D(0,2,2);
+        Point3D c = new Point3D(0,2,1);
+        Point3D d = new Point3D(0,1,0);
 
         Cubic cubic = new Cubic(Cubic.COONS,a,b,c,d);
 

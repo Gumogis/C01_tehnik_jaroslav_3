@@ -8,6 +8,7 @@ import View.Panel;
 import transforms.*;
 
 
+import javax.swing.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -51,7 +52,9 @@ public class Controller3D {
     private boolean rotate = false;
     private boolean move = false;
     private boolean zoom = false;
+    private boolean isAnimating = false;
     private int cameraSwitch = 0;
+    private Timer animationTimer;
 
     public Controller3D(Panel panel) {
 
@@ -68,13 +71,14 @@ public class Controller3D {
 
     private void initObjects(){
 
-        //objekty pro kameru
+        //objekt pro kameru
         camera = new Camera()
                 .withPosition(new Vec3D(0,-6,5))
                 .withAzimuth(Math.toRadians(90))
                 .withZenith(Math.toRadians(-25))
                 .withFirstPerson(true);
 
+        //Matice pro pohledové mody
         proj = new Mat4PerspRH(
                 Math.toRadians(60),
                 panel.getRaster().getHeight() / (float) panel.getRaster().getWidth(),
@@ -113,7 +117,7 @@ public class Controller3D {
         axisY = new AxisY();
         axisZ = new AxisZ();
 
-
+        //přidáváme vytvořená tělesa do listu ze kterého potom budeme vybírat kterým budeme manipulovat
         axis.add(axisX);
         axis.add(axisY);
         axis.add(axisZ);
@@ -198,34 +202,28 @@ public class Controller3D {
                         zoomObject(2,0);
                 }
 
-                if(key == KeyEvent.VK_8)
-                    moveObject(1,0);
-
                 if(key == KeyEvent.VK_R) {
                     rotate = !rotate;
-                    if(rotate){
+                    if(rotate)
                         System.out.println("Rotating selected object");
-                    } else{
+                    else
                         System.out.println("Stopping rotation of a selected object");
-                    }
                 }
 
-                if(key == KeyEvent.VK_M){
+                if(key == KeyEvent.VK_T){
                     move = !move;
-                    if(move){
+                    if(move)
                         System.out.println("Moving selected object");
-                    } else{
+                    else
                         System.out.println("Stopping the movement");
-                    }
                 }
 
                 if(key == KeyEvent.VK_Z){
                     zoom = !zoom;
-                    if(zoom){
+                    if(zoom)
                         System.out.println("Scaling/Zooming the selected object");
-                    } else{
+                    else
                         System.out.println("Stopping the zooming/scaling");
-                    }
                 }
 
                 if(key == KeyEvent.VK_C){
@@ -239,10 +237,18 @@ public class Controller3D {
                     System.out.println("switching perspective");
                 }
 
+                if(key == KeyEvent.VK_J){
+                    if (isAnimating)
+                        stopAnimation();
+                    else
+                        startAnimation();
+                }
+
                 redraw();
             }
         });
 
+        //listener pro myš, když se stiskne tlačítko myši (pravé i levé) tak začne pohybovat kamerou
         panel.addMouseMotionListener(new MouseMotionAdapter() {
             private int lastX = -1, lastY = -1;
 
@@ -268,6 +274,7 @@ public class Controller3D {
         });
     }
 
+    //funkce pro pohyb, rotaci a zoom vybraných objektů
     private void rotateObject(double r, int axis){
         Point3D xyz = solids.get(selectedSolid).getCenter();
         xyz = xyz.mul(solids.get(selectedSolid).getModel());
@@ -301,6 +308,31 @@ public class Controller3D {
         else if(axis == 2)
             solids.get(selectedSolid).setModel(solids.get(selectedSolid).getModel().mul(new Mat4Scale(1,r,1)));
 
+    }
+
+    //Funkce které zapnou a vypnou animace, animace točí tělesem okolo všech os
+    private void startAnimation() {
+        if (isAnimating) return;
+
+        isAnimating = true;
+
+        animationTimer = new Timer(32, e -> {
+                rotateObject(5,0);
+                rotateObject(-5,1);
+                rotateObject(5,2);
+                redraw();
+        });
+
+        animationTimer.start();
+    }
+
+    private void stopAnimation() {
+        if (!isAnimating) return;
+
+        isAnimating = false;
+        if (animationTimer != null) {
+            animationTimer.stop();
+        }
     }
 
     // Funkce co nám kreslí už uložené objekty, prochází listy
