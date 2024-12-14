@@ -41,6 +41,7 @@ public class Controller3D {
 
     //proměnné na změnění rychlosti, barev, booleany
     private int selectedSolid = 0;
+    private Mat4ViewRH viewProj;
     private final double CameraSpeed = 0.1;
     private final double sensitivity = 0.01;
     private int selectedColor = 0xFF69B4;
@@ -48,7 +49,7 @@ public class Controller3D {
     private boolean rotate = false;
     private boolean move = false;
     private boolean zoom = false;
-    private boolean cameraBool = false;
+    private int cameraSwitch = 0;
 
     public Controller3D(Panel panel) {
 
@@ -84,6 +85,12 @@ public class Controller3D {
                 10,
                 0.01,
                 200
+        );
+
+        viewProj = new Mat4ViewRH(
+                new Vec3D(0,1,0),
+                new Vec3D(0,1,0),
+                new Vec3D(0,1,0)
         );
 
         lineRasterizer = new LineRasterizerTrivial(panel.getRaster());
@@ -221,7 +228,7 @@ public class Controller3D {
                             .withZenith(Math.toRadians(-25))
                             .withFirstPerson(true);
 
-                    cameraBool = !cameraBool;
+                    cameraSwitch = (cameraSwitch+1)%3;
                     System.out.println("switching perspective");
                 }
 
@@ -294,10 +301,12 @@ public class Controller3D {
         panel.clear();
 
         renderer.setViewMatrix(camera.getViewMatrix());
-        if(cameraBool){
-            renderer.setProjectionMatrix(orthProj);
-        }else {
+        if(cameraSwitch == 0){
             renderer.setProjectionMatrix(proj);
+        }else if(cameraSwitch == 1){
+            renderer.setProjectionMatrix(orthProj);
+        } else if(cameraSwitch == 2) {
+            renderer.setProjectionMatrix(viewProj);
         }
 
         renderer.renderSolids(axis);

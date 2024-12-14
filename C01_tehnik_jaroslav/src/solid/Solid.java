@@ -42,6 +42,7 @@ public class Solid {
         this.color = color;
     }
 
+    //zprůměrujeme všechny body ve vertex bufferu a vyjde nám středový bod podle kterého můžeme transformovat
     public Point3D getCenter(){
         int vbSize = vb.size();
         double x = 0;
