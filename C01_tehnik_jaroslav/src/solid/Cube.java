@@ -4,14 +4,14 @@ import transforms.Point3D;
 
 public class Cube extends Solid {
     public Cube() {
-        vb.add(new Point3D(0,0,0));
-        vb.add(new Point3D(1,0,0));
-        vb.add(new Point3D(1,0,1));
-        vb.add(new Point3D(0,0,1));
-        vb.add(new Point3D(0,1,0));
-        vb.add(new Point3D(1,1,0));
-        vb.add(new Point3D(0,1,1));
         vb.add(new Point3D(1,1,1));
+        vb.add(new Point3D(2,1,1));
+        vb.add(new Point3D(2,1,2));
+        vb.add(new Point3D(1,1,2));
+        vb.add(new Point3D(1,2,1));
+        vb.add(new Point3D(2,2,1));
+        vb.add(new Point3D(1,2,2));
+        vb.add(new Point3D(2,2,2));
 
         addIndices(
                 0,1,

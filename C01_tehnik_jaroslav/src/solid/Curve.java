@@ -6,12 +6,13 @@ public class Curve extends Solid {
 public Curve() {
 
     //upravit, nesmí být stejné
-    int n = 100;
+    int n = 1000;
     for(int i = 0; i <= n; i++){
         float x = i/(float)n;
-        float z = (float) Math.sin(5*Math.PI*x);
+        float y = (float) Math.sin(2*Math.PI*x);
+        float z = (float) Math.cos(5*Math.PI*x)* (float) Math.sin(-3*Math.PI*x);
 
-        vb.add(new Point3D(x,0,z));
+        vb.add(new Point3D(x,y,z));
         if(i != n){
             ib.add(i);
             ib.add(i+1);

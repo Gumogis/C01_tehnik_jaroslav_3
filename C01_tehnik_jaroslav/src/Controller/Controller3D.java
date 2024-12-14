@@ -33,7 +33,9 @@ public class Controller3D {
     private AxisY axisY;
     private AxisZ axisZ;
     private Curve curve;
-    private CubicCurve cubicCurve;
+    private CubicBezierCurve cubicBezierCurve;
+    private CubicFergusonCurve cubicFergusonCurve;
+    private CubicCoonCurve cubicCoonCurve;
 
     //listy pro solidy se kterýma budeme pracovat a statické osy xyz
     private ArrayList<Solid> solids;
@@ -102,7 +104,9 @@ public class Controller3D {
 
         // vytváření objektů
         curve = new Curve();
-        cubicCurve = new CubicCurve();
+        cubicBezierCurve = new CubicBezierCurve();
+        cubicFergusonCurve = new CubicFergusonCurve();
+        cubicCoonCurve = new CubicCoonCurve();
         cube = new Cube();
         cuboid = new Pyramid();
         axisX = new AxisX();
@@ -115,7 +119,10 @@ public class Controller3D {
         axis.add(axisZ);
         solids.add(cube);
         solids.add(cuboid);
-        solids.add(cubicCurve);
+        solids.add(cubicBezierCurve);
+        solids.add(cubicFergusonCurve);
+        solids.add(cubicCoonCurve);
+        solids.add(curve);
 
         solids.get(selectedSolid).setColor(selectedColor);
     }
